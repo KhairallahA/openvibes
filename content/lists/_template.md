@@ -32,3 +32,8 @@ items:
 ## Optional markdown
 
 Anything here renders under the list: how-to, notes, FAQ.
+
+## FAQ
+
+### Questions here become FAQPage rich results
+Each "### " heading inside a "## FAQ" section is a question; the text under it is the answer.

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { SavedView } from "@/components/SavedView";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Saved",
-  description: "Picks you bookmarked on this device.",
-  robots: { index: false },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Your saved picks",
+  description: "The free AI tools, models and credits you bookmarked on OpenVibes. Saved on this device, no account needed.",
+  path: "/saved",
+  noindex: true,
+});
 
 export default function SavedPage() {
   return (

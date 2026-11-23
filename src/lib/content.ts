@@ -52,6 +52,7 @@ export type List = Omit<z.infer<typeof ListSchema>, "items"> & {
   categories: { name: string; count: number }[];
   itemTags: { name: string; count: number }[];
   bodyHtml: string;
+  faq: { q: string; a: string }[];
 };
 
 const DIR = path.join(process.cwd(), "content", "lists");
@@ -70,6 +71,25 @@ function tally(values: string[]) {
   const m = new Map<string, number>();
   for (const v of values) m.set(v, (m.get(v) ?? 0) + 1);
   return [...m].map(([name, count]) => ({ name, count }));
+}
+
+/** Pulls Q&A pairs from a "## FAQ" section (each question is a "### " heading). */
+function extractFaq(md: string) {
+  const m = md.match(/^##\s+(?:FAQ|Frequently asked questions)\s*$([\s\S]*?)(?=^##\s|(?![\s\S]))/im);
+  if (!m) return [];
+  const out: { q: string; a: string }[] = [];
+  for (const block of m[1].split(/^###\s+/m).slice(1)) {
+    const [first, ...rest] = block.split("\n");
+    const a = rest
+      .join("\n")
+      .replace(/`([^`]*)`/g, "$1")
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      .replace(/[*_>#]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (first.trim() && a) out.push({ q: first.trim(), a });
+  }
+  return out;
 }
 
 function load(file: string): List {
@@ -98,7 +118,8 @@ function load(file: string): List {
     items,
     categories: tally(items.map((i) => i.category)),
     itemTags: tally(items.flatMap((i) => i.tags)).sort((a, b) => b.count - a.count),
-    bodyHtml: content.trim() ? (marked.parse(content, { async: false }) as string) : "",
+    bodyHtml: content.trim() ? (marked.parse(content, { async: false }) as string).replace(/<a href="(https?:\/\/)/g, '<a target="_blank" rel="noopener" href="$1') : "",
+    faq: extractFaq(content),
   };
 }
 

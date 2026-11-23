@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { formatDate, getAllLists, getList, hostOf } from "@/lib/content";
 import { site } from "@/lib/site";
 import { ListExplorer } from "@/components/ListExplorer";
@@ -10,6 +10,8 @@ import { ShareBar } from "@/components/ShareBar";
 import { FollowNudge } from "@/components/FollowNudge";
 import { ListCard } from "@/components/ListCard";
 import { IconShield } from "@/components/icons";
+import { JsonLd } from "@/components/JsonLd";
+import { listLd, pageMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   return getAllLists().map((l) => ({ slug: l.slug }));
@@ -18,44 +20,20 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const list = getList(slug);
-  if (!list) return {};
-  const title = `${list.title} (${list.count})`;
-  return {
-    title,
+  if (!list) return { title: "Not found", robots: { index: false, follow: true } };
+  return pageMetadata({
+    title: `${list.title} (${list.count})`,
     description: list.description,
-    alternates: { canonical: `/${list.slug}` },
-    keywords: [...list.tags, list.category, "free", "AI"],
-    openGraph: { type: "article", title, description: list.description, url: `/${list.slug}`, modifiedTime: list.updated },
-    twitter: { card: "summary_large_image", title, description: list.description },
-  };
+    path: `/${list.slug}`,
+    type: "article",
+  });
 }
 
-// The URL-independent shell renders instantly; the list (which depends on the slug) is
-// prerendered for every known slug at build time and streams in on client navigations.
-export default function ListPage({ params }: PageProps<"/[slug]">) {
-  return (
-    <Suspense fallback={<ListSkeleton />}>
-      <ListContent params={params} />
-    </Suspense>
-  );
-}
+// Every known slug is prerendered at build time. Params are read at the top (not behind Suspense)
+// so unknown slugs return a real HTTP 404 instead of a soft 404.
+export const instant = false;
 
-function ListSkeleton() {
-  return (
-    <div className="mx-auto max-w-6xl animate-pulse px-4 pt-16 sm:px-6" aria-busy="true" aria-label="Loading list">
-      <div className="h-6 w-48 rounded-full bg-surface-2" />
-      <div className="mt-6 h-14 w-3/4 rounded-2xl bg-surface-2" />
-      <div className="mt-3 h-14 w-1/2 rounded-2xl bg-surface-2" />
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="h-56 rounded-2xl border border-line bg-surface" />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-async function ListContent({ params }: Pick<PageProps<"/[slug]">, "params">) {
+export default async function ListPage({ params }: PageProps<"/[slug]">) {
   const { slug } = await params;
   const list = getList(slug);
   if (!list) notFound();
@@ -65,20 +43,10 @@ async function ListContent({ params }: Pick<PageProps<"/[slug]">, "params">) {
   const related = getAllLists().filter((l) => l.slug !== list.slug).slice(0, 3);
   const shareText = list.hook ?? `${list.title} (${list.count})`;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: list.title,
-    description: list.description,
-    url: `${site.url}/${list.slug}`,
-    dateModified: list.updated,
-    numberOfItems: list.count,
-    itemListElement: list.items.map((it, i) => ({ "@type": "ListItem", position: i + 1, name: it.name, url: it.url })),
-  };
 
   return (
     <div className="accent-scope" style={{ "--accent": list.accent } as CSSProperties}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLd data={listLd(list)} />
       <section className="relative overflow-hidden">
         <div className="bg-grid pointer-events-none absolute inset-0" />
         <div className="glow pointer-events-none absolute -top-64 right-[-10%] size-[700px]" />

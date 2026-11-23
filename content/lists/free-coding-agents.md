@@ -185,3 +185,11 @@ items:
 The agents are free to install and their source is public. Cloud models you connect to them may cost money. Pair one with a local Ollama model (bottom of the list) for a fully free setup.
 
 > Gemini CLI is not listed: its README says free access moved to Antigravity CLI on June 18, 2026.
+
+## FAQ
+
+### Are these Claude Code alternatives free?
+The agents are free to install and their source code is public. Cloud models you connect may cost money; pair an agent with a local Ollama model for a $0 setup.
+
+### Can they run with a local model?
+Yes. Several agents document support for local models through Ollama or LM Studio. The last four picks are free local models to power them.

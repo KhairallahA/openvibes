@@ -1,5 +1,6 @@
 "use client";
 
+import { outbound } from "@/lib/site";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { SearchEntry } from "@/lib/content";
@@ -87,7 +88,7 @@ export function CommandPalette() {
 
   const go = (e: SearchEntry, external = false) => {
     setOpen(false);
-    if (external && e.url) window.open(e.url, "_blank", "noopener");
+    if (external && e.url) window.open(outbound(e.url), "_blank", "noopener");
     else router.push(e.t === "list" ? `/${e.slug}` : `/${e.slug}#${e.id}`);
   };
 

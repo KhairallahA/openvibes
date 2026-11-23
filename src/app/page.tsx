@@ -4,6 +4,18 @@ import { site } from "@/lib/site";
 import { ListCard } from "@/components/ListCard";
 import { Newsletter } from "@/components/Newsletter";
 import { HeroSearch } from "@/components/HeroSearch";
+import { JsonLd } from "@/components/JsonLd";
+import { homeLd, pageMetadata } from "@/lib/seo";
+import type { Metadata } from "next";
+
+export function generateMetadata(): Metadata {
+  const lists = getAllLists();
+  return pageMetadata({
+    absoluteTitle: `${site.name} · ${site.shortTagline}`,
+    description: `${site.description} ${lists.length} lists, ${totalItems()} verified picks.`,
+    path: "/",
+  });
+}
 
 export default function Home() {
   const lists = getAllLists();
@@ -11,18 +23,9 @@ export default function Home() {
   const sources = new Set(lists.flatMap((l) => l.items.map((i) => hostOf(i.url)))).size;
   const [first, ...rest] = lists;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: site.name,
-    url: site.url,
-    description: site.description,
-    author: { "@type": "Person", name: site.author, url: `https://x.com/${site.x}` },
-  };
-
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLd data={homeLd(lists)} />
       <section className="relative overflow-hidden">
         <div className="bg-grid pointer-events-none absolute inset-0" />
         <div className="glow pointer-events-none absolute left-1/2 top-[-220px] size-[720px] -translate-x-1/2" />

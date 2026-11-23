@@ -1,5 +1,6 @@
 "use client";
 
+import { outbound } from "@/lib/site";
 import type { Item } from "@/lib/content";
 import { savedKey, useSaved } from "@/lib/stores";
 import { CopyButton, useCopy } from "./CopyButton";
@@ -64,7 +65,7 @@ export function ItemCard({
         <span className="mt-0.5 font-mono text-xs tabular-nums text-faint">{n}</span>
         <div className="min-w-0 flex-1">
           <h3 className="text-[1.05rem] font-semibold leading-snug tracking-tight text-ink">
-            <a href={item.url} target="_blank" rel="noopener" className="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none">
+            <a href={outbound(item.url)} target="_blank" rel="noopener" className="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none">
               <Highlight text={item.name} q={q} />
             </a>
           </h3>
@@ -116,7 +117,7 @@ export function ItemCard({
         )}
         <div className="relative z-10 flex items-center gap-1 border-t border-line pt-3">
           <a
-            href={item.url}
+            href={outbound(item.url)}
             target="_blank"
             rel="noopener"
             className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-[#0b0b0d] transition hover:brightness-110"
@@ -134,7 +135,7 @@ export function ItemCard({
           <span className="ml-auto inline-flex items-center gap-1 text-[11px] text-faint" title={`Last verified ${verifiedLabel}`}>
             <IconShield width={12} height={12} />
             {item.source ? (
-              <a href={item.source} target="_blank" rel="noopener" className="underline decoration-dotted underline-offset-2 hover:text-ink">
+              <a href={outbound(item.source)} target="_blank" rel="noopener" className="underline decoration-dotted underline-offset-2 hover:text-ink">
                 source
               </a>
             ) : (

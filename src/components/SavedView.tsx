@@ -1,5 +1,6 @@
 "use client";
 
+import { outbound } from "@/lib/site";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { SearchEntry } from "@/lib/content";
@@ -48,7 +49,7 @@ export function SavedView() {
               <p className="truncate text-xs text-muted">{e.list}{e.badge ? ` · ${e.badge}` : ""}</p>
             </div>
             {e.url && (
-              <a href={e.url} target="_blank" rel="noopener" className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1.5 text-xs text-ink-2 hover:text-ink">
+              <a href={outbound(e.url)} target="_blank" rel="noopener" className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1.5 text-xs text-ink-2 hover:text-ink">
                 Open <IconArrowUpRight width={12} height={12} />
               </a>
             )}

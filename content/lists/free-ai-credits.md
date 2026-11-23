@@ -168,3 +168,11 @@ Offers change and some depend on eligibility (new customers, verification, regio
 - **No affiliate links, no tracking.** Every link goes straight to the provider.
 - Every amount was read on the provider's own pricing or docs page on the verified date.
 - Max one-time signup credit across the list: **$1,210** (GCP 300 · Oracle 300 · Azure 200 · AWS up to 200 · Deepgram 200 · Cerebras 5 · v0 5).
+
+## FAQ
+
+### Are these AI credits really free?
+Yes. Every amount was read on the provider's own pricing or docs page. Some need a new account, verification or a card on file; the card tags say which.
+
+### Do the offers change?
+Yes. Providers change free tiers often, so each card shows the date it was last verified. Open the claim page before relying on an offer.

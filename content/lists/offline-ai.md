@@ -188,3 +188,14 @@ items:
 Then copy any command above. The first run downloads the model; after that it works with no internet.
 
 > Sizes are download sizes from ollama.com on the verified date. You need more RAM/VRAM than the file size.
+
+## FAQ
+
+### Do I need a GPU to run these?
+No. Ollama runs models on a normal laptop CPU or an Apple Silicon Mac. A GPU or more memory makes bigger models faster.
+
+### How much memory do I need?
+More than the download size shown on each card. Pick a smaller model if your laptop has little RAM.
+
+### Is it really free?
+Yes. Ollama and the models are free. After the one-time download there is no API key and no monthly bill.

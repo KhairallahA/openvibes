@@ -35,7 +35,9 @@ export function Footer() {
           <ul className="mt-3 space-y-2 text-sm">
             <li><Link href="/saved" className="text-muted hover:text-ink">Your saved items</Link></li>
             <li><a href={`https://x.com/${site.x}`} target="_blank" rel="noopener" className="text-muted hover:text-ink">@{site.x} on X</a></li>
-            <li><Link href="/sitemap.xml" className="text-muted hover:text-ink">Sitemap</Link></li>
+            <li><a href="/feed.xml" className="text-muted hover:text-ink">RSS feed</a></li>
+            <li><a href="/sitemap.xml" className="text-muted hover:text-ink">Sitemap</a></li>
+            <li><a href="/llms.txt" className="text-muted hover:text-ink">llms.txt</a></li>
           </ul>
         </div>
       </div>

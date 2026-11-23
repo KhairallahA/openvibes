@@ -165,3 +165,17 @@ Some models are fine-tuned on new data (like Dolphin or Hermes). Others have the
 ## Use them responsibly
 
 These are general-purpose open models. Follow the law and each model's licence. Any model can be confidently wrong, so check important answers.
+
+## FAQ
+
+### What does "uncensored" mean for an AI model?
+It is an open model with fewer built-in refusals. Some are fine-tuned on new data (like Dolphin), others have the refusal behaviour removed from the weights directly, which is called abliterated or heretic.
+
+### Are these models free?
+Yes. The models on Hugging Face and Ollama in this list are free to download, and the apps listed (Ollama, Jan, LM Studio, GPT4All, KoboldCpp, llamafile, llama.cpp, Open WebUI) are free to use.
+
+### Do they run offline?
+Yes. After the one-time download they run on your own computer with no internet, so your prompts never leave your machine.
+
+### Is it legal to use them?
+Downloading and running open models is legal in most places. Follow the law and each model's licence.
