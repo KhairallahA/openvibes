@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
+/* Design tokens — dark is the default theme. */
+:root,
+[data-theme="dark"] {
+  --bg: #08080a;
+  --bg-2: #0e0e12;
+  --surface: #121217;
+  --surface-2: #18181f;
+  --line: rgb(255 255 255 / 0.08);
+  --line-2: rgb(255 255 255 / 0.14);
+  --ink: #f4f4f6;
+  --ink-2: #c9c9d1;
+  --muted: #8b8b98;
+  --faint: #5d5d6a;
+  --brand: #c6ff3d;
+  --brand-ink: #0b0b0d;
+  --glow: 0.22;
+  color-scheme: dark;
+}
+[data-theme="light"] {
+  --bg: #f7f7f4;
+  --bg-2: #efefea;
+  --surface: #ffffff;
+  --surface-2: #f3f3ef;
+  --line: rgb(10 10 20 / 0.09);
+  --line-2: rgb(10 10 20 / 0.16);
+  --ink: #0d0d12;
+  --ink-2: #33333d;
+  --muted: #62626e;
+  --faint: #9a9aa6;
+  --brand: #4a8a00;
+  --brand-ink: #ffffff;
+  --glow: 0.12;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-accent: var(--accent, var(--brand));
+  --color-accent-fg: var(--accent-fg, var(--brand));
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jb), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --animate-rise: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+  scroll-padding-top: 96px;
+}
+body {
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  text-rendering: optimizeLegibility;
+}
+::selection { background: var(--accent, var(--brand)); color: var(--brand-ink); }
+
+/* Per-list accent scope. Bright accents are darkened for text in light mode for contrast. */
+.accent-scope { --accent-fg: var(--accent); }
+[data-theme="light"] .accent-scope { --accent-fg: color-mix(in oklab, var(--accent) 58%, #000); }
+
+/* Background texture: faint grid fading out from the top */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 30%, transparent 75%);
+}
+.glow {
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--accent, var(--brand)) calc(var(--glow) * 100%), transparent), transparent);
+}
+.text-gradient {
+  background: linear-gradient(120deg, var(--ink) 20%, var(--accent, var(--brand)) 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Deep-linked item highlight (/slug#item-id) */
+.item-card:target {
+  outline: 2px solid var(--accent, var(--brand));
+  outline-offset: 3px;
+}
+
+@layer base {
+  :focus-visible { outline: 2px solid var(--accent, var(--brand)); outline-offset: 2px; }
+}
+
+/* Markdown body */
+.prose-v { color: var(--ink-2); line-height: 1.7; font-size: 1rem; }
+.prose-v h2 { font-family: var(--font-bricolage); color: var(--ink); font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin: 2rem 0 0.75rem; }
+.prose-v h3 { color: var(--ink); font-size: 1.125rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
+.prose-v p { margin: 0.75rem 0; }
+.prose-v ul { list-style: disc; padding-left: 1.25rem; margin: 0.75rem 0; }
+.prose-v li { margin: 0.35rem 0; }
+.prose-v a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent, var(--brand)); text-underline-offset: 3px; }
+.prose-v strong { color: var(--ink); }
+.prose-v code { font-family: var(--font-mono); font-size: 0.85em; background: var(--surface-2); border: 1px solid var(--line); padding: 0.1em 0.4em; border-radius: 6px; }
+.prose-v blockquote { border-left: 3px solid var(--accent, var(--brand)); padding: 0.25rem 0 0.25rem 1rem; color: var(--muted); margin: 1rem 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

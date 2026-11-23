@@ -1,0 +1,89 @@
+# vibes — every free AI goldmine on the internet
+
+A fast, static directory site: curated lists of free AI models, credits and tools, one Markdown file per list.
+Built with **Next.js 16 (App Router, TypeScript)**, **Tailwind CSS v4** and **Markdown + YAML frontmatter**. No database.
+
+## Run it
+
+```bash
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # static production build (every list is pre-rendered)
+npm run start      # serve the production build
+npm run lint
+node scripts/check-links.mjs   # checks every item url + source returns < 400
+```
+
+Set your domain once (used for canonical URLs, sitemap, OG images):
+
+```bash
+# .env.local (and in Vercel → Settings → Environment Variables)
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+# optional, when you pick a newsletter provider (see src/components/Newsletter.tsx)
+NEXT_PUBLIC_NEWSLETTER_ACTION=https://provider.example/form-endpoint
+```
+
+Brand name, tagline and X handle live in `src/lib/site.ts`.
+
+## Add a list (just drop a Markdown file)
+
+1. Copy `content/lists/_template.md` to `content/lists/<slug>.md`. The file name is the URL: `uncensored-ai.md` → `/uncensored-ai`.
+2. Fill the frontmatter and the `items:` array. The item count, category chips (with counts), tag chips, search index, sitemap entry, JSON-LD and the OG image are all generated from it.
+3. Run `node scripts/check-links.mjs`, then `npm run build`. A typo in the frontmatter fails the build with a clear message (validated with zod), so a broken list can never ship.
+
+Why frontmatter for items (instead of parsing Markdown bullets)? Each item has 5–9 structured fields (badge, command, source, tags…). YAML keeps them typed and validated, while the Markdown body stays free for prose (how-to, notes, FAQ).
+
+### Item fields
+
+| field | required | what it does |
+|---|---|---|
+| `name` | yes | card title (searchable, highlighted) |
+| `url` | yes | the **Open ↗** button, should be the official page |
+| `source` | no | page the facts were read from, linked as "source" next to the verified date |
+| `category` | no | filter chip with count |
+| `badge` | no | the one-line proof, e.g. `$300 free credit`, `19 GB download` |
+| `description` | no | one or two sentences |
+| `tags` | no | extra filter chips |
+| `command` | no | copyable command block |
+| `verified` | no | per-item "last verified" date (defaults to the list's `verified`) |
+
+## Features
+
+- Static generation for every page; list pages + OG images built at build time.
+- Per-list search with highlight, category + tag filters with counts, sort (curated / A→Z / saved first), detailed or compact cards, `/` to focus search.
+- ⌘K / Ctrl+K command palette that searches every list and every item (loads a small static `/search.json` on first open).
+- Save/bookmark any item to `localStorage`, a header counter, and a `/saved` page across lists.
+- Copy-link button on every card produces a deep link (`/slug#item-id`) that scrolls to and highlights the card.
+- Copy buttons for commands, "Share on X" pre-filled with the list hook.
+- "Last verified" date + source link on every card. No affiliate links.
+- Dark mode by default with a no-flash light toggle; per-list accent colour (auto-darkened for contrast in light mode).
+- Dynamic OG images per list (`next/og`), sized 1200×630 for X `summary_large_image` cards.
+- `sitemap.xml`, `robots.txt`, canonical URLs, Open Graph/Twitter meta, JSON-LD (`WebSite`, `ItemList`).
+- Accessible: skip link, labelled controls, `aria-pressed` toggles, keyboard-navigable palette, reduced-motion support.
+- Email capture UI (no backend yet — **TODO** in `src/components/Newsletter.tsx`) and a dismissible "follow on X" nudge on list pages.
+
+## Deploy (Vercel)
+
+1. Push this folder to a GitHub repo.
+2. In Vercel: **Add New → Project → import the repo**. Framework is detected as Next.js; no settings needed.
+3. Add `NEXT_PUBLIC_SITE_URL` (your domain) in Environment Variables, then deploy.
+4. Add your domain under **Settings → Domains**.
+
+Every push to `main` redeploys; adding a list is a one-file commit.
+
+## Project layout
+
+```
+content/lists/*.md          one file per list (frontmatter + markdown body)
+src/lib/content.ts          loads + validates lists, builds the search index
+src/lib/site.ts             brand, domain, X handle
+src/lib/og.tsx              shared OG image frame + fonts
+src/app/page.tsx            home (all collections with counts)
+src/app/[slug]/page.tsx     list page
+src/app/[slug]/opengraph-image.tsx   per-list OG image
+src/app/search.json/route.ts static search index
+src/app/saved/page.tsx      saved items
+src/app/sitemap.ts, robots.ts
+src/components/*            UI (ListExplorer, ItemCard, CommandPalette, …)
+scripts/check-links.mjs     link checker
+```
