@@ -39,7 +39,7 @@ export function CopyButton({ text, label = "Copy", className = "" }: { text: str
     <button
       type="button"
       onClick={() => copy(text)}
-      className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition ${copied ? "text-accent-fg" : "text-muted hover:text-ink"} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition cursor-pointer ${copied ? "text-accent-fg" : "text-muted hover:text-ink"} ${className}`}
       aria-label={copied ? "Copied" : label}
     >
       {copied ? <IconCheck width={14} height={14} /> : <IconCopy width={14} height={14} />}

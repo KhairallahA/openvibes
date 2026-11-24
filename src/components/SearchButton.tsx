@@ -8,7 +8,7 @@ export function SearchButton() {
     <button
       type="button"
       onClick={() => openPalette()}
-      className="flex h-9 items-center gap-2 rounded-full border border-line bg-surface/60 pl-3 pr-2 text-sm text-muted transition hover:border-line-2 hover:text-ink"
+      className="flex h-9 items-center gap-2 rounded-full border border-line bg-surface/60 pl-3 pr-2 text-sm text-muted transition cursor-pointer hover:border-line-2 hover:text-ink"
       aria-label="Search everything"
     >
       <IconSearch />

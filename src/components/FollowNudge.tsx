@@ -32,7 +32,7 @@ export function FollowNudge() {
   };
   return (
     <aside className="fixed inset-x-3 bottom-3 z-50 animate-rise rounded-2xl border border-line-2 bg-surface/95 p-4 shadow-2xl backdrop-blur sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-80" aria-label="Follow for daily lists">
-      <button type="button" onClick={close} aria-label="Dismiss" className="absolute right-2 top-2 grid size-7 place-items-center rounded-lg text-faint hover:text-ink">
+      <button type="button" onClick={close} aria-label="Dismiss" className="absolute right-2 top-2 grid size-7 place-items-center rounded-lg text-faint hover:text-ink cursor-pointer">
         <IconX width={14} height={14} />
       </button>
       <p className="pr-6 font-display text-lg font-bold leading-tight">You found this list by luck.</p>

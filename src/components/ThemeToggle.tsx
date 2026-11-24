@@ -13,7 +13,7 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label={label}
       title={label}
-      className="grid size-9 place-items-center rounded-full border border-line text-muted transition hover:border-line-2 hover:text-ink"
+      className="grid size-9 place-items-center rounded-full border border-line text-muted transition cursor-pointer hover:border-line-2 hover:text-ink"
     >
       {mounted && theme === "light" ? <IconMoon /> : <IconSun />}
     </button>

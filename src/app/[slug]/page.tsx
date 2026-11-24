@@ -5,6 +5,7 @@ import type { CSSProperties } from "react";
 import { formatDate, getAllLists, getList, hostOf } from "@/lib/content";
 import { site } from "@/lib/site";
 import { ListExplorer } from "@/components/ListExplorer";
+import { Roadmap } from "@/components/Roadmap";
 import { Newsletter } from "@/components/Newsletter";
 import { ShareBar } from "@/components/ShareBar";
 import { FollowNudge } from "@/components/FollowNudge";
@@ -103,6 +104,9 @@ export default async function ListPage({ params }: PageProps<"/[slug]">) {
       </section>
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {list.roadmap.length > 0 && (
+          <Roadmap steps={list.roadmap} counts={Object.fromEntries(list.categories.map((c) => [c.name, c.count]))} />
+        )}
         <ListExplorer slug={list.slug} items={list.items} categories={list.categories} tags={list.itemTags} verifiedLabel={verifiedLabel} />
 
         {list.bodyHtml && (

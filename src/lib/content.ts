@@ -24,6 +24,16 @@ const ItemSchema = z.object({
   verified: dateish.optional(),
 });
 
+/** Optional ordered learning path rendered above the list. `category` links a step to its items. */
+const StepSchema = z.object({
+  title: z.string().min(1),
+  phase: z.string().optional(),
+  category: z.string().optional(),
+  summary: z.string().default(""),
+  topics: z.array(z.string()).default([]),
+  build: z.string().optional(),
+});
+
 const ListSchema = z.object({
   title: z.string().min(1),
   shortTitle: z.string().optional(),
@@ -39,9 +49,11 @@ const ListSchema = z.object({
   featured: z.boolean().default(false),
   draft: z.boolean().default(false),
   stats: z.array(z.object({ value: z.string(), label: z.string(), note: z.string().optional() })).default([]),
+  roadmap: z.array(StepSchema).default([]),
   items: z.array(ItemSchema).min(1),
 });
 
+export type Step = z.infer<typeof StepSchema>;
 export type Item = z.infer<typeof ItemSchema> & { id: string; verified: string };
 export type List = Omit<z.infer<typeof ListSchema>, "items"> & {
   slug: string;

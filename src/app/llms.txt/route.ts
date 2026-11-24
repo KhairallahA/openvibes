@@ -18,6 +18,16 @@ export function GET() {
     ...lists.flatMap((l) => [
       `## ${l.shortTitle} (${l.count})`,
       "",
+      ...(l.roadmap.length
+        ? [
+            "Roadmap, in order:",
+            "",
+            ...l.roadmap.map((s, i) => `${i + 1}. ${s.title}${s.summary ? `: ${s.summary}` : ""}${s.build ? ` Build: ${s.build}.` : ""}`),
+            "",
+            "Resources:",
+            "",
+          ]
+        : []),
       ...l.items.map((it) => `- [${it.name}](${it.url})${it.badge ? ` — ${it.badge}` : ""}${it.description ? `: ${it.description}` : ""}${it.command ? ` Command: \`${it.command}\`` : ""}`),
       "",
     ]),

@@ -77,7 +77,7 @@ export function ItemCard({
           aria-pressed={saved}
           aria-label={saved ? `Remove ${item.name} from saved` : `Save ${item.name}`}
           title={saved ? "Saved" : "Save for later"}
-          className={`relative z-10 grid size-8 shrink-0 place-items-center rounded-full border transition ${saved ? "border-accent/50 bg-accent/15 text-accent-fg" : "border-line text-faint hover:border-line-2 hover:text-ink"}`}
+          className={`relative z-10 grid size-8 shrink-0 place-items-center rounded-full border transition cursor-pointer ${saved ? "border-accent/50 bg-accent/15 text-accent-fg" : "border-line text-faint hover:border-line-2 hover:text-ink"}`}
         >
           <IconBookmark filled={saved} width={15} height={15} />
         </button>
@@ -127,7 +127,7 @@ export function ItemCard({
           <button
             type="button"
             onClick={copyDeepLink}
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs transition ${link.copied ? "text-accent-fg" : "text-muted hover:text-ink"}`}
+            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs transition cursor-pointer ${link.copied ? "text-accent-fg" : "text-muted hover:text-ink"}`}
           >
             {link.copied ? <IconCheck width={13} height={13} /> : <IconLink width={13} height={13} />}
             {link.copied ? "Link copied" : "Copy link"}

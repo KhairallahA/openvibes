@@ -31,6 +31,19 @@ export function ListExplorer({
   const { isSaved, saved } = useSaved();
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Roadmap steps (and any other component) can pick a category: dispatch "vibes:filter" with { category }.
+  useEffect(() => {
+    const onFilter = (e: Event) => {
+      const c = (e as CustomEvent<{ category?: string }>).detail?.category ?? null;
+      setCat(c);
+      setTag(null);
+      setQuery("");
+      setOnlySaved(false);
+    };
+    window.addEventListener("vibes:filter", onFilter);
+    return () => window.removeEventListener("vibes:filter", onFilter);
+  }, []);
+
   // "/" focuses the list search (like GitHub / X)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -78,7 +91,7 @@ export function ListExplorer({
     }`;
 
   return (
-    <section aria-label="Explore the list">
+    <section id="resources" aria-label="Explore the list" className="scroll-mt-20">
       <div className="sticky top-16 z-30 -mx-4 border-b border-line bg-bg/80 px-4 py-3 backdrop-blur-xl sm:mx-0 sm:rounded-2xl sm:border sm:px-3">
         <div className="flex gap-2">
           <label className="relative flex flex-1 items-center">
@@ -93,7 +106,7 @@ export function ListExplorer({
               className="h-11 w-full rounded-xl border border-line bg-surface pl-10 pr-10 text-[15px] text-ink outline-none transition placeholder:text-faint focus:border-accent/60 focus:ring-4 focus:ring-accent/10"
             />
             {query ? (
-              <button type="button" onClick={() => setQuery("")} aria-label="Clear search" className="absolute right-2 grid size-7 place-items-center rounded-lg text-faint hover:text-ink">
+              <button type="button" onClick={() => setQuery("")} aria-label="Clear search" className="absolute right-2 grid size-7 place-items-center rounded-lg text-faint cursor-pointer hover:text-ink">
                 <IconX width={14} height={14} />
               </button>
             ) : (
@@ -111,10 +124,10 @@ export function ListExplorer({
             <option value="saved">Saved first</option>
           </select>
           <div className="hidden overflow-hidden rounded-xl border border-line sm:flex" role="group" aria-label="Layout">
-            <button type="button" onClick={() => setCompact(false)} aria-pressed={!compact} aria-label="Detailed cards" className={`grid w-10 place-items-center transition ${!compact ? "bg-surface-2 text-ink" : "text-faint hover:text-ink"}`}>
+            <button type="button" onClick={() => setCompact(false)} aria-pressed={!compact} aria-label="Detailed cards" className={`grid w-10 place-items-center transition cursor-pointer ${!compact ? "bg-surface-2 text-ink" : "text-faint hover:text-ink"}`}>
               <IconGrid />
             </button>
-            <button type="button" onClick={() => setCompact(true)} aria-pressed={compact} aria-label="Compact cards" className={`grid w-10 place-items-center transition ${compact ? "bg-surface-2 text-ink" : "text-faint hover:text-ink"}`}>
+            <button type="button" onClick={() => setCompact(true)} aria-pressed={compact} aria-label="Compact cards" className={`grid w-10 place-items-center transition cursor-pointer ${compact ? "bg-surface-2 text-ink" : "text-faint hover:text-ink"}`}>
               <IconRows />
             </button>
           </div>
@@ -143,7 +156,7 @@ export function ListExplorer({
                 type="button"
                 aria-pressed={tag === t.name}
                 onClick={() => setTag(tag === t.name ? null : t.name)}
-                className={`shrink-0 rounded-md border px-2 py-0.5 text-xs transition ${tag === t.name ? "border-accent/50 bg-accent/15 text-accent-fg" : "border-line text-muted hover:text-ink"}`}
+                className={`shrink-0 rounded-md border px-2 py-0.5 text-xs transition cursor-pointer ${tag === t.name ? "border-accent/50 bg-accent/15 text-accent-fg" : "border-line text-muted hover:text-ink"}`}
               >
                 #{t.name}
               </button>
@@ -157,7 +170,7 @@ export function ListExplorer({
           Showing <span className="font-semibold text-ink">{results.length}</span> of {items.length}
         </p>
         {filtered && (
-          <button type="button" onClick={reset} className="text-accent-fg hover:underline">
+          <button type="button" onClick={reset} className="text-accent-fg cursor-pointer hover:underline">
             Clear filters
           </button>
         )}
@@ -173,7 +186,7 @@ export function ListExplorer({
         <div className="mt-6 rounded-2xl border border-dashed border-line-2 p-10 text-center">
           <p className="font-display text-xl font-bold">Nothing matches that.</p>
           <p className="mt-1 text-sm text-muted">{onlySaved ? "You haven't saved anything in this list yet." : "Try a shorter word, or search every list with ⌘K."}</p>
-          <button type="button" onClick={reset} className="mt-4 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-bg">
+          <button type="button" onClick={reset} className="mt-4 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-bg cursor-pointer">
             Show everything
           </button>
         </div>

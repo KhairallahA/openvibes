@@ -13,7 +13,7 @@ export function ShareBar({ path, text }: { path: string; text: string }) {
       <button
         type="button"
         onClick={() => copy(typeof window !== "undefined" ? `${window.location.origin}${path}` : url)}
-        className="inline-flex h-10 items-center gap-2 rounded-full border border-line px-4 text-sm text-ink-2 transition hover:border-line-2 hover:text-ink"
+        className="inline-flex h-10 items-center gap-2 rounded-full border border-line px-4 text-sm text-ink-2 transition cursor-pointer hover:border-line-2 hover:text-ink"
       >
         {copied ? <IconCheck className="text-accent-fg" /> : <IconLink />}
         {copied ? "Copied" : "Copy link"}

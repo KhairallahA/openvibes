@@ -38,7 +38,7 @@ export function SavedView() {
     <>
       <div className="mt-8 flex items-center justify-between text-sm text-muted">
         <p>{entries.length} saved</p>
-        <button type="button" onClick={() => confirm("Remove all saved picks?") && clear()} className="hover:text-ink">Clear all</button>
+        <button type="button" onClick={() => confirm("Remove all saved picks?") && clear()} className="hover:text-ink cursor-pointer">Clear all</button>
       </div>
       <ul className="mt-4 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
         {entries.map(({ k, e }) => (
@@ -53,7 +53,7 @@ export function SavedView() {
                 Open <IconArrowUpRight width={12} height={12} />
               </a>
             )}
-            <button type="button" onClick={() => toggle(k)} aria-label={`Remove ${e.name}`} className="grid size-8 place-items-center rounded-full text-brand hover:bg-surface-2">
+            <button type="button" onClick={() => toggle(k)} aria-label={`Remove ${e.name}`} className="grid size-8 place-items-center rounded-full text-brand cursor-pointer hover:bg-surface-2">
               <IconBookmark filled width={15} height={15} />
             </button>
           </li>

@@ -160,7 +160,7 @@ export function CommandPalette() {
                     go(e, true);
                   }}
                   aria-label={`Open ${e.name} in a new tab`}
-                  className="grid size-7 place-items-center rounded-lg text-faint hover:bg-bg hover:text-ink"
+                  className="grid size-7 place-items-center rounded-lg text-faint hover:bg-bg hover:text-ink cursor-pointer"
                 >
                   <IconArrowUpRight width={14} height={14} />
                 </button>

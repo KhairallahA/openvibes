@@ -41,7 +41,7 @@ export function Newsletter({ compact = false }: { compact?: boolean }) {
           placeholder="you@email.com"
           className="h-12 flex-1 rounded-full border border-line bg-bg px-5 text-ink outline-none placeholder:text-faint focus:border-accent/60 focus:ring-4 focus:ring-accent/10"
         />
-        <button type="submit" className="h-12 rounded-full bg-accent px-6 font-bold text-[#0b0b0d] transition hover:brightness-110">
+        <button type="submit" className="h-12 rounded-full bg-accent px-6 font-bold text-[#0b0b0d] transition cursor-pointer hover:brightness-110">
           Notify me
         </button>
       </form>
