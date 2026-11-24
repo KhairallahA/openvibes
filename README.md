@@ -24,8 +24,7 @@ Configuration lives in **`src/lib/site.ts`** (brand, domain, X handle) and env v
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | – | `<meta name="google-site-verification">` |
 | `NEXT_PUBLIC_BING_SITE_VERIFICATION` | – | `<meta name="msvalidate.01">` |
 | `NEXT_PUBLIC_YANDEX_VERIFICATION` | – | `<meta name="yandex-verification">` |
-| `NEXT_PUBLIC_ANALYTICS` | off | `vercel`, `plausible` or `both` |
-| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` / `NEXT_PUBLIC_PLAUSIBLE_SRC` | site domain / plausible.io | Plausible settings |
+| `NEXT_PUBLIC_ANALYTICS` | — | Google Analytics 4 Measurement ID, e.g. `G-XXXXXXXXXX`. Unset = no analytics. Production builds only. |
 | `NEXT_PUBLIC_OUTBOUND_REF` | off | adds `?ref=<value>` to every outbound link |
 | `NEXT_PUBLIC_NEWSLETTER_ACTION` | – | email form POST endpoint |
 

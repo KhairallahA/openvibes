@@ -13,6 +13,7 @@
     "icons": "python3 scripts/gen-icons.py"
   },
   "dependencies": {
+    "@next/third-parties": "^16.4.6",
     "@vercel/analytics": "^2.0.1",
     "gray-matter": "^4.0.3",
     "marked": "^18.2.1",

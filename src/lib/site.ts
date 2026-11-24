@@ -40,11 +40,14 @@ export const verification = {
   yandex: clean(process.env.NEXT_PUBLIC_YANDEX_VERIFICATION),
 };
 
-/** Analytics — off unless set. NEXT_PUBLIC_ANALYTICS = "vercel" | "plausible" | "both". */
+/**
+ * Google Analytics 4. Set NEXT_PUBLIC_ANALYTICS to your GA4 Measurement ID (e.g. G-XXXXXXXXXX)
+ * in Vercel → Settings → Environment Variables. Unset = no analytics.
+ * The script only loads in production builds, so `npm run dev` never sends data.
+ */
 export const analytics = {
-  provider: clean(process.env.NEXT_PUBLIC_ANALYTICS) as "vercel" | "plausible" | "both" | undefined,
-  plausibleDomain: clean(process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN) ?? domainLabel,
-  plausibleSrc: clean(process.env.NEXT_PUBLIC_PLAUSIBLE_SRC) ?? "https://plausible.io/js/script.outbound-links.js",
+  gaId: clean(process.env.NEXT_PUBLIC_ANALYTICS),
+  enabled: process.env.NODE_ENV === "production",
 };
 
 /** Optional `?ref=<value>` on outbound links (off by default). NEXT_PUBLIC_OUTBOUND_REF=vibes */

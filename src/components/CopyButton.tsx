@@ -33,12 +33,15 @@ export function useCopy(timeout = 1400) {
   return { copied, copy };
 }
 
-export function CopyButton({ text, label = "Copy", className = "" }: { text: string; label?: string; className?: string }) {
+export function CopyButton({ text, label = "Copy", className = "", onCopy }: { text: string; label?: string; className?: string; onCopy?: () => void }) {
   const { copied, copy } = useCopy();
   return (
     <button
       type="button"
-      onClick={() => copy(text)}
+      onClick={() => {
+        copy(text);
+        onCopy?.();
+      }}
       className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition cursor-pointer ${copied ? "text-accent-fg" : "text-muted hover:text-ink"} ${className}`}
       aria-label={copied ? "Copied" : label}
     >

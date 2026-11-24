@@ -3,6 +3,7 @@
 import { outbound } from "@/lib/site";
 import type { Item } from "@/lib/content";
 import { savedKey, useSaved } from "@/lib/stores";
+import { track } from "@/lib/track";
 import { CopyButton, useCopy } from "./CopyButton";
 import { IconArrowUpRight, IconBookmark, IconCheck, IconLink, IconShield } from "./icons";
 import type { ReactNode } from "react";
@@ -54,6 +55,13 @@ export function ItemCard({
     const url = `${window.location.origin}/${slug}#${item.id}`;
     history.replaceState(null, "", `#${item.id}`);
     link.copy(url);
+    track("copy_link", { list_slug: slug, item_id: item.id, item_name: item.name });
+  };
+  const open = (placement: string) => () =>
+    track("open_resource", { list_slug: slug, item_id: item.id, item_name: item.name, item_category: item.category, link_url: item.url, placement });
+  const toggleSave = () => {
+    track(saved ? "unsave_item" : "save_item", { list_slug: slug, item_id: item.id, item_name: item.name });
+    toggle(k);
   };
 
   return (
@@ -65,7 +73,7 @@ export function ItemCard({
         <span className="mt-0.5 font-mono text-xs tabular-nums text-faint">{n}</span>
         <div className="min-w-0 flex-1">
           <h3 className="text-[1.05rem] font-semibold leading-snug tracking-tight text-ink">
-            <a href={outbound(item.url)} target="_blank" rel="noopener" className="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none">
+            <a href={outbound(item.url)} target="_blank" rel="noopener" onClick={open("title")} className="after:absolute after:inset-0 after:rounded-2xl focus-visible:outline-none">
               <Highlight text={item.name} q={q} />
             </a>
           </h3>
@@ -73,7 +81,7 @@ export function ItemCard({
         </div>
         <button
           type="button"
-          onClick={() => toggle(k)}
+          onClick={toggleSave}
           aria-pressed={saved}
           aria-label={saved ? `Remove ${item.name} from saved` : `Save ${item.name}`}
           title={saved ? "Saved" : "Save for later"}
@@ -101,7 +109,7 @@ export function ItemCard({
         <div className="relative z-10 mt-4 flex items-center gap-2 rounded-xl border border-line bg-bg/70 py-1.5 pl-3 pr-1.5">
           <span className="select-none font-mono text-xs text-accent-fg">$</span>
           <code className="no-scrollbar min-w-0 flex-1 overflow-x-auto whitespace-nowrap font-mono text-xs text-ink-2">{item.command}</code>
-          <CopyButton text={item.command} className="shrink-0 bg-surface-2" />
+          <CopyButton text={item.command} className="shrink-0 bg-surface-2" onCopy={() => track("copy_command", { list_slug: slug, item_id: item.id, item_name: item.name })} />
         </div>
       )}
 
@@ -120,6 +128,7 @@ export function ItemCard({
             href={outbound(item.url)}
             target="_blank"
             rel="noopener"
+            onClick={open("button")}
             className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-[#0b0b0d] transition hover:brightness-110"
           >
             Open <IconArrowUpRight width={13} height={13} />
