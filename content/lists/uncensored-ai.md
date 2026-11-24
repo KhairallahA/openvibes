@@ -8,8 +8,8 @@ category: AI models
 tags: [uncensored, abliterated, offline, local]
 icon: "◎"
 accent: "#ff4d8d"
-updated: "2026-11-23"
-verified: "2026-11-23"
+updated: "2026-11-24"
+verified: "2026-11-24"
 featured: true
 stats:
   - value: "159"

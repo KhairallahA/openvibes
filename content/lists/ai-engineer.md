@@ -3,7 +3,7 @@ title: Every free resource to become an AI engineer
 shortTitle: AI engineer roadmap
 hook: f**king goldmine for AI engineers
 description: 'A free 16-step AI engineer roadmap: Python to RAG, agents, evals, security, LLMOps, fine-tuning and interviews. 108 official docs, courses, repos and papers.'
-lede: 16 steps from writing software to shipping AI systems, in order. Each step says what to learn and what to build, then links the free official docs, courses, repos and papers to learn it. 108 links, all checked on 23 Nov 2026.
+lede: 16 steps from writing software to shipping AI systems, in order. Each step says what to learn and what to build, then links the free official docs, courses, repos and papers to learn it. 108 links, all checked on 24 Nov 2026.
 category: Learning
 tags:
 - ai-engineering
@@ -14,8 +14,8 @@ tags:
 - courses
 icon: →
 accent: '#ffb347'
-updated: '2026-11-23'
-verified: '2026-11-23'
+updated: '2026-11-24'
+verified: '2026-11-24'
 featured: true
 stats:
 - value: '16'
