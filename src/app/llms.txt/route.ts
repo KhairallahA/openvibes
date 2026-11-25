@@ -21,7 +21,7 @@ export function GET() {
       ? [
           "## Guides",
           "",
-          ...guides.map((g) => `- [${g.title} (${g.count} ${g.unit})](${abs(`/${g.slug}`)}): ${g.description} Checked ${formatDate(g.verified)}.`),
+          ...guides.map((g) => `- [${g.title} (${g.countLabel})](${abs(`/${g.slug}`)}): ${g.description} Checked ${formatDate(g.verified)}.`),
           "",
         ]
       : []),
@@ -42,12 +42,13 @@ export function GET() {
       "",
     ]),
     ...guides.flatMap((g) => [
-      `## ${g.shortTitle} (${g.count} ${g.unit})`,
+      `## ${g.shortTitle} (${g.countLabel})`,
       "",
       ...(g.disclaimer ? [g.disclaimer, ""] : []),
       ...g.sections.flatMap((s) => [
         `### ${s.number}. ${s.title}`,
         "",
+        ...(g.layout === "course" ? [`${s.intro} [Open chapter](${abs(`/${g.slug}#${s.id}`)})`, ""] : []),
         ...s.formulas.map((f) => `- [${f.name}](${abs(`/${g.slug}#${f.id}`)}): $${f.tex.replace(/\s+/g, " ")}$ — ${f.means}${f.bot ? ` Bot use: ${f.bot}` : ""}`),
         "",
       ]),

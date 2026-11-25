@@ -203,14 +203,42 @@ export function listLd(list: List) {
 
 export function guideLd(guide: Guide) {
   const url = abs(`/${guide.slug}`);
+  const isCourse = guide.layout === "course";
+  const course: Record<string, unknown> = {
+    "@type": ["Course", "LearningResource"],
+    "@id": `${url}#course`,
+    url,
+    name: `${guide.title} (${guide.countLabel})`,
+    description: guide.description,
+    inLanguage: site.language,
+    isAccessibleForFree: true,
+    provider: { "@id": orgId },
+    author: { "@id": personId },
+    image: ogImage.url,
+    dateModified: guide.updated,
+    keywords: guide.tags.join(", "),
+    educationalLevel: "Beginner to intermediate",
+    learningResourceType: ["Interactive course", "Quiz", "Simulation"],
+    interactivityType: "mixed",
+    teaches: guide.chapters.map((c) => c.title),
+    timeRequired: `PT${Math.round(guide.chapters.reduce((n, c) => n + c.minutes, 0) / 60)}H`,
+    offers: [{ "@type": "Offer", category: "Free", price: 0, priceCurrency: "USD" }],
+    hasCourseInstance: [{ "@type": "CourseInstance", courseMode: "Online", courseWorkload: `PT${Math.round(guide.chapters.reduce((n, c) => n + c.minutes, 0) / 60)}H` }],
+    syllabusSections: guide.chapters.map((c) => ({ "@type": "Syllabus", name: `${c.number}. ${c.title}`, description: c.summary, url: `${url}#${c.id}`, timeRequired: `PT${c.minutes}M` })),
+    hasPart: guide.chapters.map((c) => ({ "@type": "LearningResource", name: c.title, url: `${url}#${c.id}`, learningResourceType: c.interactive ? "Interactive lesson" : "Lesson" })),
+    citation: guide.resources.map((r) => ({ "@type": "CreativeWork", name: r.name, url: r.url })),
+    breadcrumb: { "@id": `${url}#breadcrumb` },
+    isPartOf: { "@id": websiteId },
+  };
   const graph: Record<string, unknown>[] = [
+    ...(isCourse ? [course] : []),
     {
       "@type": "TechArticle",
       "@id": `${url}#article`,
       url,
       mainEntityOfPage: url,
       headline: guide.title,
-      name: `${guide.title} (${guide.count} ${guide.unit})`,
+      name: `${guide.title} (${guide.countLabel})`,
       description: guide.description,
       inLanguage: site.language,
       isPartOf: { "@id": websiteId },
@@ -221,6 +249,7 @@ export function guideLd(guide: Guide) {
       image: ogImage.url,
       isAccessibleForFree: true,
       proficiencyLevel: "Beginner",
+      ...(isCourse ? { about: { "@id": `${url}#course` } } : {}),
       breadcrumb: { "@id": `${url}#breadcrumb` },
       hasPart: guide.sections.map((s) => ({ "@type": "WebPageElement", name: s.title, url: `${url}#${s.id}` })),
       citation: guide.resources.map((r) => ({ "@type": "CreativeWork", name: r.name, url: r.url })),

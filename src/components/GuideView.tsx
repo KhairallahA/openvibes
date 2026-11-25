@@ -9,8 +9,10 @@ import { ListExplorer } from "./ListExplorer";
 import { GuideToc } from "./GuideToc";
 import { CodeCopy } from "./CodeCopy";
 import { IconLink, IconShield } from "./icons";
+import { CourseView } from "./course/CourseView";
 
 export function GuideView({ guide }: { guide: Guide }) {
+  if (guide.layout === "course") return <CourseView guide={guide} />;
   const verifiedLabel = formatDate(guide.verified);
   const toc = guide.sections.map((s) => ({ id: s.id, number: s.number, title: s.title, count: s.formulas.length }));
   const extra = [

@@ -31,7 +31,35 @@ const SectionSchema = z.object({
   formulas: z.array(FormulaSchema).min(1),
 });
 
+const QuizSchema = z
+  .object({
+    q: z.string().min(1),
+    options: z.array(z.string().min(1)).min(2).max(5),
+    answer: z.number().int().min(0),
+    why: z.string().min(1),
+  })
+  .refine((q) => q.answer < q.options.length, { message: "quiz answer index out of range" });
+
+/** A course chapter: prose (markdown + $math$), key equations, an interactive, a worked example, code, a quiz and further reading. */
+const ChapterSchema = z.object({
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  title: z.string().min(1),
+  short: z.string().optional(),
+  phase: z.string().min(1),
+  minutes: z.number().int().positive().default(15),
+  summary: z.string().min(1),
+  body: z.string().min(1),
+  equations: z.array(FormulaSchema.omit({ code: true, lang: true, bot: true })).default([]),
+  interactive: z.object({ name: z.string().regex(/^[A-Z][A-Za-z0-9]+$/), title: z.string().min(1), caption: z.string().default("") }).optional(),
+  example: z.object({ title: z.string().min(1), body: z.string().min(1) }).optional(),
+  code: z.object({ title: z.string().default("Try it in code"), lang: z.string().default("python"), code: z.string().min(1) }).optional(),
+  quiz: z.array(QuizSchema).default([]),
+  deeper: z.array(z.string()).default([]),
+  build: z.string().optional(),
+});
+
 const GuideSchema = z.object({
+  layout: z.enum(["formulas", "course"]).default("formulas"),
   title: z.string().min(1),
   shortTitle: z.string().optional(),
   hook: z.string().optional(),
@@ -48,14 +76,40 @@ const GuideSchema = z.object({
   unit: z.string().default("formulas"),
   disclaimer: z.string().optional(),
   stats: z.array(z.object({ value: z.string(), label: z.string(), note: z.string().optional() })).default([]),
-  sections: z.array(SectionSchema).min(1),
+  sections: z.array(SectionSchema).default([]),
+  chapters: z.array(ChapterSchema).default([]),
   resources: z.array(ItemSchema).default([]),
-});
+}).refine((g) => (g.layout === "course" ? g.chapters.length > 0 : g.sections.length > 0), { message: "a formulas guide needs sections; a course needs chapters" });
 
 export type Formula = z.infer<typeof FormulaSchema> & { html: string; meansHtml: string; botHtml?: string; exampleHtml?: string; number: string };
 export type Section = Omit<z.infer<typeof SectionSchema>, "formulas"> & { number: string; introHtml: string; formulas: Formula[] };
-export type Guide = Omit<z.infer<typeof GuideSchema>, "sections" | "resources"> & {
+export type QuizQ = { qHtml: string; options: string[]; answer: number; whyHtml: string };
+export type Chapter = {
+  id: string;
+  number: string;
+  title: string;
+  short: string;
+  phase: string;
+  minutes: number;
+  summaryHtml: string;
+  summary: string;
+  bodyHtml: string;
+  equations: Formula[];
+  interactive?: { name: string; title: string; captionHtml: string };
+  example?: { title: string; bodyHtml: string };
+  code?: { title: string; lang: string; code: string };
+  quiz: QuizQ[];
+  deeper: Item[];
+  buildHtml?: string;
+  build?: string;
+};
+export type Guide = Omit<z.infer<typeof GuideSchema>, "sections" | "resources" | "chapters"> & {
   kind: "guide";
+  /** e.g. "70 formulas" or "16 chapters, 16 interactives": used in titles, feeds and llms.txt */
+  countLabel: string;
+  chapters: Chapter[];
+  interactiveCount: number;
+  quizCount: number;
   slug: string;
   shortTitle: string;
   verified: string;
@@ -91,6 +145,25 @@ function inline(s: string, where: string) {
       return esc(part);
     })
     .join("");
+}
+
+/**
+ * Markdown with math: $$display$$ and $inline$ are rendered by KaTeX at build time, `code` is protected,
+ * and \$ is a literal dollar sign. Everything else goes through marked.
+ */
+function mdMath(src: string, where: string) {
+  const stash: string[] = [];
+  const keep = (html: string, tag = "M") => `@@${tag}${stash.push(html) - 1}@@`;
+  let s = src.replace(/\\\$/g, () => keep("&#36;"));
+  s = s.replace(/`[^`\n]+`/g, (m) => keep(`<code>${esc(m.slice(1, -1))}</code>`));
+  s = s.replace(/\$\$([\s\S]+?)\$\$/g, (_, t: string) => `\n\n${keep(`<div class="math-block my-4 overflow-x-auto rounded-xl border border-line bg-bg/70 px-3 py-3 sm:px-5">${tex(t.trim(), true, where)}</div>`, "D")}\n\n`);
+  s = s.replace(/\$([^$\n]+?)\$/g, (_, t: string) => keep(tex(t, false, where)));
+  const html = (marked.parse(s, { async: false }) as string)
+    .replace(/<p>\s*@@D(\d+)@@\s*<\/p>/g, (_, i: string) => stash[+i])
+    .replace(/@@[MD](\d+)@@/g, (_, i: string) => stash[+i])
+    .replace(/<a href="(https?:\/\/)/g, '<a target="_blank" rel="noopener" href="$1');
+  if (/@@[MD]\d+@@/.test(html)) throw new Error(`Unresolved math placeholder in ${where}`);
+  return html;
 }
 
 function tally(values: string[]) {
@@ -137,14 +210,71 @@ function load(file: string): Guide {
     seen.add(id);
     return { ...it, id, verified: it.verified ?? verified };
   });
+  const byName = new Map(resources.map((r) => [r.name, r]));
+  for (const r of resources) ids.add(r.id);
+  const chapters: Chapter[] = d.chapters.map((c, ci) => {
+    const where = `${file} → chapter ${c.id}`;
+    for (const id of [c.id, ...c.equations.map((e) => e.id)]) {
+      if (ids.has(id)) throw new Error(`Duplicate id "${id}" in content/guides/${file}`);
+      ids.add(id);
+    }
+    return {
+      id: c.id,
+      number: String(ci + 1).padStart(2, "0"),
+      title: c.title,
+      short: c.short ?? c.title,
+      phase: c.phase,
+      minutes: c.minutes,
+      summary: c.summary,
+      summaryHtml: inline(c.summary, where),
+      bodyHtml: mdMath(c.body, where),
+      equations: c.equations.map((f, fi) => ({
+        ...f,
+        lang: "python",
+        number: `${ci + 1}.${fi + 1}`,
+        html: tex(f.tex, true, `${where} → ${f.id}`),
+        meansHtml: inline(f.means, `${where} → ${f.id}`),
+        exampleHtml: f.example ? inline(f.example, `${where} → ${f.id}`) : undefined,
+      })),
+      interactive: c.interactive ? { name: c.interactive.name, title: c.interactive.title, captionHtml: inline(c.interactive.caption, where) } : undefined,
+      example: c.example ? { title: c.example.title, bodyHtml: mdMath(c.example.body, `${where} (example)`) } : undefined,
+      code: c.code,
+      quiz: c.quiz.map((q, qi) => ({
+        qHtml: inline(q.q, `${where} quiz ${qi + 1}`),
+        options: q.options.map((o) => inline(o, `${where} quiz ${qi + 1}`)),
+        answer: q.answer,
+        whyHtml: inline(q.why, `${where} quiz ${qi + 1}`),
+      })),
+      deeper: c.deeper.map((n) => {
+        const r = byName.get(n);
+        if (!r) throw new Error(`Chapter "${c.id}" in content/guides/${file} references unknown resource "${n}"`);
+        return r;
+      }),
+      build: c.build,
+      buildHtml: c.build ? inline(c.build, where) : undefined,
+    };
+  });
+  // Course chapters double as "sections" (with their key equations) so search, llms.txt, cards and JSON-LD keep working.
+  const allSections: Section[] =
+    d.layout === "course"
+      ? chapters.map((c) => ({ id: c.id, title: c.title, kicker: c.phase, intro: c.summary, number: c.number, introHtml: c.summaryHtml, formulas: c.equations }))
+      : sections;
+  const interactiveCount = chapters.filter((c) => c.interactive).length;
+  const count = d.layout === "course" ? chapters.length : sections.reduce((n, s) => n + s.formulas.length, 0);
+  const unit = d.layout === "course" ? "chapters" : d.unit;
   return {
     ...d,
     kind: "guide",
     slug,
     shortTitle: d.shortTitle ?? d.title,
     verified,
-    count: sections.reduce((n, s) => n + s.formulas.length, 0),
-    sections,
+    count,
+    unit,
+    countLabel: d.layout === "course" ? `${chapters.length} chapters, ${interactiveCount} interactives` : `${count} ${unit}`,
+    chapters,
+    interactiveCount,
+    quizCount: chapters.reduce((n, c) => n + c.quiz.length, 0),
+    sections: allSections,
     resources,
     resourceCategories: tally(resources.map((r) => r.category)),
     resourceTags: tally(resources.flatMap((r) => r.tags)).sort((a, b) => b.count - a.count),
