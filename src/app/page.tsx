@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getAllLists, totalItems, hostOf, formatDate } from "@/lib/content";
 import { site } from "@/lib/site";
 import { ListCard } from "@/components/ListCard";
+import { GuideCard } from "@/components/GuideCard";
+import { getAllGuides } from "@/lib/guides";
 import { Newsletter } from "@/components/Newsletter";
 import { HeroSearch } from "@/components/HeroSearch";
 import { JsonLd } from "@/components/JsonLd";
@@ -19,13 +21,14 @@ export function generateMetadata(): Metadata {
 
 export default function Home() {
   const lists = getAllLists();
+  const guides = getAllGuides();
   const total = totalItems();
   const sources = new Set(lists.flatMap((l) => l.items.map((i) => hostOf(i.url)))).size;
   const [first, ...rest] = lists;
 
   return (
     <>
-      <JsonLd data={homeLd(lists)} />
+      <JsonLd data={homeLd([...lists, ...guides])} />
       <section className="relative overflow-hidden">
         <div className="bg-grid pointer-events-none absolute inset-0" />
         <div className="glow pointer-events-none absolute left-1/2 top-[-220px] size-[720px] -translate-x-1/2" />
@@ -53,6 +56,12 @@ export default function Home() {
                 {l.shortTitle} <span className="font-mono text-xs text-faint">{l.count}</span>
               </Link>
             ))}
+            {guides.map((g) => (
+              <Link key={g.slug} href={`/${g.slug}`} className="rounded-full border border-line px-3 py-1.5 text-muted transition hover:border-line-2 hover:text-ink">
+                <span className="mr-1.5 font-mono text-xs" style={{ color: g.accent }}>{g.icon}</span>
+                {g.shortTitle} <span className="font-mono text-xs text-faint">{g.count} {g.unit}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -76,6 +85,18 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {guides.length > 0 && (
+        <section id="guides" className="mx-auto mt-20 max-w-6xl scroll-mt-24 px-4 sm:px-6">
+          <p className="text-xs font-semibold uppercase tracking-widest text-faint">Deep guides</p>
+          <h2 className="mt-1 font-display text-3xl font-extrabold tracking-tight sm:text-4xl">Learn the math, not just the links</h2>
+          <div className="mt-8 grid gap-4">
+            {guides.map((g) => (
+              <GuideCard key={g.slug} guide={g} />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="mx-auto mt-20 max-w-6xl px-4 sm:px-6">
         <div className="grid gap-4 md:grid-cols-3">

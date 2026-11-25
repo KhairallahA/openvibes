@@ -1,9 +1,11 @@
 import { getAllLists, formatDate } from "@/lib/content";
 import { abs, site } from "@/lib/site";
+import { getAllGuides } from "@/lib/guides";
 
 // https://llmstxt.org — a plain-text map of the site for LLMs and AI agents.
 export function GET() {
   const lists = getAllLists();
+  const guides = getAllGuides();
   const lines = [
     `# ${site.name}`,
     "",
@@ -15,6 +17,14 @@ export function GET() {
     "",
     ...lists.map((l) => `- [${l.title} (${l.count})](${abs(`/${l.slug}`)}): ${l.description} Verified ${formatDate(l.verified)}.`),
     "",
+    ...(guides.length
+      ? [
+          "## Guides",
+          "",
+          ...guides.map((g) => `- [${g.title} (${g.count} ${g.unit})](${abs(`/${g.slug}`)}): ${g.description} Checked ${formatDate(g.verified)}.`),
+          "",
+        ]
+      : []),
     ...lists.flatMap((l) => [
       `## ${l.shortTitle} (${l.count})`,
       "",
@@ -29,6 +39,21 @@ export function GET() {
           ]
         : []),
       ...l.items.map((it) => `- [${it.name}](${it.url})${it.badge ? ` — ${it.badge}` : ""}${it.description ? `: ${it.description}` : ""}${it.command ? ` Command: \`${it.command}\`` : ""}`),
+      "",
+    ]),
+    ...guides.flatMap((g) => [
+      `## ${g.shortTitle} (${g.count} ${g.unit})`,
+      "",
+      ...(g.disclaimer ? [g.disclaimer, ""] : []),
+      ...g.sections.flatMap((s) => [
+        `### ${s.number}. ${s.title}`,
+        "",
+        ...s.formulas.map((f) => `- [${f.name}](${abs(`/${g.slug}#${f.id}`)}): $${f.tex.replace(/\s+/g, " ")}$ — ${f.means}${f.bot ? ` Bot use: ${f.bot}` : ""}`),
+        "",
+      ]),
+      "### References",
+      "",
+      ...g.resources.map((r) => `- [${r.name}](${r.url})${r.badge ? ` — ${r.badge}` : ""}: ${r.description}`),
       "",
     ]),
     "## Optional",

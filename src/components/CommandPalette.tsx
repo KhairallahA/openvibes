@@ -149,7 +149,7 @@ export function CommandPalette() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-ink">{e.name}</p>
                 <p className="truncate text-xs text-muted">
-                  {e.t === "list" ? `List · ${e.count} picks` : `${e.list}${e.badge ? ` · ${e.badge}` : ""}`}
+                  {e.t === "list" ? `${e.unit && e.unit !== "picks" ? "Guide" : "List"} · ${e.count} ${e.unit ?? "picks"}` : `${e.list}${e.badge ? ` · ${e.badge}` : ""}`}
                 </p>
               </div>
               {e.t === "item" && e.url ? (

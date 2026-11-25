@@ -1,13 +1,16 @@
-// Usage: node scripts/check-links.mjs  -> HEAD/GET every item url + source in content/lists/*.md
+// Usage: node scripts/check-links.mjs  -> HEAD/GET every item/resource url + source in content/lists and content/guides
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 
-const dir = path.join(process.cwd(), "content/lists");
 const urls = new Map();
-for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(".md"))) {
-  const { data } = matter(fs.readFileSync(path.join(dir, f), "utf8"));
-  for (const it of data.items ?? []) for (const u of [it.url, it.source]) if (u) urls.set(u, f);
+for (const sub of ["lists", "guides"]) {
+  const dir = path.join(process.cwd(), "content", sub);
+  if (!fs.existsSync(dir)) continue;
+  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith(".md"))) {
+    const { data } = matter(fs.readFileSync(path.join(dir, f), "utf8"));
+    for (const it of [...(data.items ?? []), ...(data.resources ?? [])]) for (const u of [it.url, it.source]) if (u) urls.set(u, `${sub}/${f}`);
+  }
 }
 let bad = 0;
 await Promise.all(

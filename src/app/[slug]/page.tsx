@@ -12,14 +12,25 @@ import { FollowNudge } from "@/components/FollowNudge";
 import { ListCard } from "@/components/ListCard";
 import { IconShield } from "@/components/icons";
 import { JsonLd } from "@/components/JsonLd";
-import { listLd, pageMetadata } from "@/lib/seo";
+import { guideLd, listLd, pageMetadata } from "@/lib/seo";
+import { getAllGuides, getGuide } from "@/lib/guides";
+import { GuideView } from "@/components/GuideView";
 
 export function generateStaticParams() {
-  return getAllLists().map((l) => ({ slug: l.slug }));
+  return [...getAllLists(), ...getAllGuides()].map((l) => ({ slug: l.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/[slug]">): Promise<Metadata> {
   const { slug } = await params;
+  const guide = getGuide(slug);
+  if (guide) {
+    return pageMetadata({
+      title: `${guide.title} (${guide.count} ${guide.unit})`,
+      description: guide.description,
+      path: `/${guide.slug}`,
+      type: "article",
+    });
+  }
   const list = getList(slug);
   if (!list) return { title: "Not found", robots: { index: false, follow: true } };
   return pageMetadata({
@@ -36,6 +47,30 @@ export const instant = false;
 
 export default async function ListPage({ params }: PageProps<"/[slug]">) {
   const { slug } = await params;
+  const guide = getGuide(slug);
+  if (guide) {
+    const more = getAllLists().slice(0, 3);
+    return (
+      <>
+        <JsonLd data={guideLd(guide)} />
+        <GuideView guide={guide} />
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="mt-16">
+            <Newsletter compact />
+          </div>
+          <section className="mt-16">
+            <h2 className="font-display text-2xl font-extrabold tracking-tight">More goldmines</h2>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {more.map((l) => (
+                <ListCard key={l.slug} list={l} />
+              ))}
+            </div>
+          </section>
+        </div>
+        <FollowNudge />
+      </>
+    );
+  }
   const list = getList(slug);
   if (!list) notFound();
 

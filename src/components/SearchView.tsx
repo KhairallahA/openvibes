@@ -56,7 +56,7 @@ export function SearchView() {
             <span className="size-2.5 shrink-0 rounded-full" style={{ background: e.accent }} />
             <div className="min-w-0 flex-1">
               <Link href={e.t === "list" ? `/${e.slug}` : `/${e.slug}#${e.id}`} className="font-medium text-ink hover:underline">{e.name}</Link>
-              <p className="truncate text-xs text-muted">{e.t === "list" ? `List · ${e.count} picks` : `${e.list}${e.badge ? ` · ${e.badge}` : ""}`}</p>
+              <p className="truncate text-xs text-muted">{e.t === "list" ? `${e.unit && e.unit !== "picks" ? "Guide" : "List"} · ${e.count} ${e.unit ?? "picks"}` : `${e.list}${e.badge ? ` · ${e.badge}` : ""}`}</p>
             </div>
             {e.url && (
               <a href={outbound(e.url)} target="_blank" rel="noopener" className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1.5 text-xs text-ink-2 hover:text-ink">

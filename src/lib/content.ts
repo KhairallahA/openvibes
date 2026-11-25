@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { marked } from "marked";
 import { z } from "zod";
+import type { Guide } from "./guides";
 
 /**
  * Content lives in /content/lists/<slug>.md.
@@ -10,9 +11,9 @@ import { z } from "zod";
  * Everything is read synchronously at build time, so every page is fully static (SSG).
  */
 
-const dateish = z.union([z.string(), z.date()]).transform((v) => (v instanceof Date ? v.toISOString().slice(0, 10) : String(v)));
+export const dateish = z.union([z.string(), z.date()]).transform((v) => (v instanceof Date ? v.toISOString().slice(0, 10) : String(v)));
 
-const ItemSchema = z.object({
+export const ItemSchema = z.object({
   name: z.string().min(1),
   url: z.url(),
   source: z.url().optional(),
@@ -86,7 +87,7 @@ function tally(values: string[]) {
 }
 
 /** Pulls Q&A pairs from a "## FAQ" section (each question is a "### " heading). */
-function extractFaq(md: string) {
+export function extractFaq(md: string) {
   const m = md.match(/^##\s+(?:FAQ|Frequently asked questions)\s*$([\s\S]*?)(?=^##\s|(?![\s\S]))/im);
   if (!m) return [];
   const out: { q: string; a: string }[] = [];
@@ -167,6 +168,7 @@ export type SearchEntry = {
   url?: string;
   badge?: string;
   count?: number;
+  unit?: string; // "picks" (lists) or e.g. "formulas" (guides)
   k: string; // lowercase keywords
 };
 
@@ -195,6 +197,53 @@ export function searchIndex(): SearchEntry[] {
         url: i.url,
         badge: i.badge,
         k: [i.name, i.description, i.category, i.badge ?? "", ...i.tags, l.shortTitle].join(" ").toLowerCase(),
+      });
+    }
+  }
+  return out;
+}
+
+/** Guides join the same index: the guide as a "list" entry, each formula/reference as an "item". */
+export function addGuidesToIndex(out: SearchEntry[], guides: Guide[]) {
+  for (const g of guides) {
+    out.push({
+      t: "list",
+      slug: g.slug,
+      name: g.title,
+      desc: g.description,
+      list: g.shortTitle,
+      accent: g.accent,
+      count: g.count,
+      unit: g.unit,
+      k: [g.title, g.shortTitle, g.description, g.category, ...g.tags].join(" ").toLowerCase(),
+    });
+    for (const s of g.sections) {
+      for (const f of s.formulas) {
+        out.push({
+          t: "item",
+          slug: g.slug,
+          id: f.id,
+          name: f.name,
+          desc: f.means.replace(/\$[^$]*\$/g, "").replace(/`/g, ""),
+          list: g.shortTitle,
+          accent: g.accent,
+          badge: s.title,
+          k: [f.name, f.means, f.bot ?? "", s.title, s.kicker ?? "", g.shortTitle, "formula"].join(" ").toLowerCase(),
+        });
+      }
+    }
+    for (const r of g.resources) {
+      out.push({
+        t: "item",
+        slug: g.slug,
+        id: r.id,
+        name: r.name,
+        desc: r.description,
+        list: g.shortTitle,
+        accent: g.accent,
+        url: r.url,
+        badge: r.badge,
+        k: [r.name, r.description, r.category, r.badge ?? "", ...r.tags, g.shortTitle].join(" ").toLowerCase(),
       });
     }
   }

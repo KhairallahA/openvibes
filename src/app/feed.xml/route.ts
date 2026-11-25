@@ -1,4 +1,5 @@
 import { getAllLists } from "@/lib/content";
+import { getAllGuides } from "@/lib/guides";
 import { abs, site } from "@/lib/site";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -6,11 +7,11 @@ const rfc822 = (d: string) => new Date(`${d}T09:00:00Z`).toUTCString();
 
 // RSS 2.0 feed of lists, newest first. Static at build time.
 export function GET() {
-  const lists = [...getAllLists()].sort((a, b) => b.updated.localeCompare(a.updated));
+  const lists = [...getAllLists(), ...getAllGuides()].sort((a, b) => b.updated.localeCompare(a.updated));
   const items = lists
     .map(
       (l) => `    <item>
-      <title>${esc(`${l.title} (${l.count})`)}</title>
+      <title>${esc(`${l.title} (${l.count}${"unit" in l ? ` ${l.unit}` : ""})`)}</title>
       <link>${abs(`/${l.slug}`)}</link>
       <guid isPermaLink="true">${abs(`/${l.slug}`)}</guid>
       <pubDate>${rfc822(l.updated)}</pubDate>

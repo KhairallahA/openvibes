@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { List } from "./content";
+import type { Guide } from "./guides";
 import { abs, site, verification } from "./site";
 
 /** ONE universal share cover for every page (public/og.png, 1200×630). */
@@ -127,7 +128,7 @@ export function breadcrumbLd(crumbs: { name: string; path: string }[]) {
   };
 }
 
-export function homeLd(lists: List[]) {
+export function homeLd(lists: (List | Guide)[]) {
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -195,6 +196,45 @@ export function listLd(list: List) {
       "@type": "FAQPage",
       "@id": `${url}#faq`,
       mainEntity: list.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    });
+  }
+  return { "@context": "https://schema.org", "@graph": graph };
+}
+
+export function guideLd(guide: Guide) {
+  const url = abs(`/${guide.slug}`);
+  const graph: Record<string, unknown>[] = [
+    {
+      "@type": "TechArticle",
+      "@id": `${url}#article`,
+      url,
+      mainEntityOfPage: url,
+      headline: guide.title,
+      name: `${guide.title} (${guide.count} ${guide.unit})`,
+      description: guide.description,
+      inLanguage: site.language,
+      isPartOf: { "@id": websiteId },
+      author: { "@id": personId },
+      publisher: { "@id": orgId },
+      dateModified: guide.updated,
+      keywords: guide.tags.join(", "),
+      image: ogImage.url,
+      isAccessibleForFree: true,
+      proficiencyLevel: "Beginner",
+      breadcrumb: { "@id": `${url}#breadcrumb` },
+      hasPart: guide.sections.map((s) => ({ "@type": "WebPageElement", name: s.title, url: `${url}#${s.id}` })),
+      citation: guide.resources.map((r) => ({ "@type": "CreativeWork", name: r.name, url: r.url })),
+    },
+    { ...breadcrumbLd([{ name: site.name, path: "/" }, { name: guide.shortTitle, path: `/${guide.slug}` }]), "@id": `${url}#breadcrumb` },
+    websiteLd(),
+    organizationLd(),
+    personLd(),
+  ];
+  if (guide.faq.length) {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": `${url}#faq`,
+      mainEntity: guide.faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
     });
   }
   return { "@context": "https://schema.org", "@graph": graph };
