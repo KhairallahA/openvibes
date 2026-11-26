@@ -42,7 +42,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-line py-5 text-center text-xs text-faint">
-        © {year} {site.author}. Built with Next.js, Tailwind and Markdown.
+        © {year} OpenVibes & {site.author}.
       </div>
     </footer>
   );
