@@ -18,8 +18,8 @@ tags:
 - course
 icon: ⚙
 accent: '#7dd3fc'
-updated: '2026-11-26'
-verified: '2026-11-26'
+updated: '2026-11-27'
+verified: '2026-11-27'
 featured: true
 unit: chapters
 stats:
