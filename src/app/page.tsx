@@ -32,7 +32,7 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="bg-grid pointer-events-none absolute inset-0" />
         <div className="glow pointer-events-none absolute left-1/2 top-[-220px] size-[720px] -translate-x-1/2" />
-        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pt-20">
+        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pt-20">
           {/* <p className="inline-flex animate-rise items-center gap-2 rounded-full border border-line bg-surface/70 px-3 py-1 text-xs text-muted backdrop-blur">
             <span className="relative flex size-2">
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand opacity-60" />
