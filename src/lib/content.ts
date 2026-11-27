@@ -217,6 +217,19 @@ export function addGuidesToIndex(out: SearchEntry[], guides: Guide[]) {
       unit: g.unit,
       k: [g.title, g.shortTitle, g.description, g.category, ...g.tags].join(" ").toLowerCase(),
     });
+    for (const c of g.chapters) {
+      out.push({
+        t: "item",
+        slug: g.slug,
+        id: c.id,
+        name: `${c.number}. ${c.title}`,
+        desc: c.summary.replace(/\$[^$]*\$/g, "").replace(/`/g, ""),
+        list: g.shortTitle,
+        accent: g.accent,
+        badge: c.interactive ? `Chapter · ${c.interactive.title}` : "Chapter",
+        k: [c.title, c.short, c.summary, c.phase, c.interactive?.title ?? "", g.shortTitle, "chapter lesson course"].join(" ").toLowerCase(),
+      });
+    }
     for (const s of g.sections) {
       for (const f of s.formulas) {
         out.push({

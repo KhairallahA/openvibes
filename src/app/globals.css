@@ -134,3 +134,13 @@ body {
 .guide-inline .katex { font-size: 1.02em; color: var(--ink); }
 .guide-inline code { font-family: var(--font-mono, ui-monospace, monospace); font-size: 0.85em; padding: 0.1em 0.35em; border-radius: 0.35rem; background: var(--surface-2); color: var(--ink); }
 .guide-inline strong { color: var(--ink); font-weight: 600; }
+
+/* Interactive courses */
+.prose-v ol { list-style: decimal; padding-left: 1.25rem; margin: 0.75rem 0; }
+.course-prose { font-size: 1.0625rem; }
+.course-prose .katex { color: var(--ink); font-size: 1.02em; }
+.course-prose .math-block .katex { font-size: 1.05em; }
+.course-prose h3 { margin-top: 1.75rem; }
+.course-prose table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1rem 0; display: block; overflow-x: auto; }
+.course-prose th, .course-prose td { border-bottom: 1px solid var(--line); padding: 0.4rem 0.6rem; text-align: left; }
+.course-prose th { color: var(--ink); font-weight: 600; }

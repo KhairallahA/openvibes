@@ -11,7 +11,7 @@ export function GET() {
   const items = lists
     .map(
       (l) => `    <item>
-      <title>${esc(`${l.title} (${l.count}${"unit" in l ? ` ${l.unit}` : ""})`)}</title>
+      <title>${esc(`${l.title} (${"countLabel" in l ? l.countLabel : l.count})`)}</title>
       <link>${abs(`/${l.slug}`)}</link>
       <guid isPermaLink="true">${abs(`/${l.slug}`)}</guid>
       <pubDate>${rfc822(l.updated)}</pubDate>

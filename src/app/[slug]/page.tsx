@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps<"/[slug]">): Promis
   const guide = getGuide(slug);
   if (guide) {
     return pageMetadata({
-      title: `${guide.title} (${guide.count} ${guide.unit})`,
+      title: `${guide.title} (${guide.countLabel})`,
       description: guide.description,
       path: `/${guide.slug}`,
       type: "article",
